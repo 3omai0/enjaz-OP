@@ -1,0 +1,3 @@
+# Contributing
+
+Use Node.js 22. Run npm ci, npm run setup and npm run dev with a dedicated development database. Open a focused pull request describing the behavior change and validation. Run npm run lint, npm run typecheck and npm run build. Check both Arabic/RTL and English UI. Exercise permissions as administrator, manager and member when changing access rules. Add migrations with npm run db:generate when changing the database schema, and commit the generated migration and metadata. Never submit credentials, real team data or database backups. Contributions are distributed under the MIT license.

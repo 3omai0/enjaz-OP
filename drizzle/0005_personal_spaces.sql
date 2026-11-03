@@ -1,0 +1,3 @@
+ALTER TABLE "projects" ADD COLUMN "personal_owner_id" uuid;--> statement-breakpoint
+ALTER TABLE "projects" ADD CONSTRAINT "projects_personal_owner_id_users_id_fk" FOREIGN KEY ("personal_owner_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "projects_personal_owner_idx" ON "projects" USING btree ("personal_owner_id") WHERE "projects"."personal_owner_id" is not null;

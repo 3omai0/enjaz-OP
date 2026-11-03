@@ -1,0 +1,35 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# local database (PGlite)
+/.data/
+
+# env files hold secrets; only the example is shared
+.env*
+!.env.example
+
+# vercel (local project link)
+.vercel
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor and assistant local state
+.claude/
+.codex/
+.agents/
+.vscode/
