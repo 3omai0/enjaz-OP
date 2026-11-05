@@ -346,6 +346,56 @@ export const pushSubscriptions = pgTable(
 );
 
 /* ------------------------------------------------------------------ */
+/* Claude (MCP) connections                                            */
+/* ------------------------------------------------------------------ */
+/**
+ * Apps that registered themselves to sign people in through OAuth (Dynamic
+ * Client Registration), such as Claude. A client only names the addresses it
+ * may send people back to; it gets access to nobody until a person approves it.
+ */
+export const mcpClients = pgTable("mcp_clients", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  redirectUris: jsonb("redirect_uris").$type<string[]>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * A person's approval for an app (Claude) to work in Injaz as them. While
+ * the one-time sign-in code waits to be exchanged, `codeHash` and its PKCE
+ * challenge are set; afterwards only the current refresh token's hash is kept.
+ * Deleting the row disconnects the app at once. A password change or
+ * deactivation (users.sessionVersion) ends it too, like any other sign-in.
+ */
+export const mcpConnections = pgTable(
+  "mcp_connections",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => mcpClients.id, { onDelete: "cascade" }),
+    clientName: text("client_name").notNull(),
+    scope: text("scope"),
+    codeHash: text("code_hash"),
+    codeChallenge: text("code_challenge"),
+    redirectUri: text("redirect_uri"),
+    codeExpiresAt: timestamp("code_expires_at", { withTimezone: true }),
+    refreshTokenHash: text("refresh_token_hash"),
+    sessionVersion: integer("session_version").notNull().default(0),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("mcp_connections_user_idx").on(t.userId),
+    uniqueIndex("mcp_connections_code_idx").on(t.codeHash).where(sql`${t.codeHash} is not null`),
+    uniqueIndex("mcp_connections_refresh_idx").on(t.refreshTokenHash).where(sql`${t.refreshTokenHash} is not null`),
+  ]
+);
+
+/* ------------------------------------------------------------------ */
 /* Relations (for db.query.* helpers)                                  */
 /* ------------------------------------------------------------------ */
 export const usersRelations = relations(users, ({ many }) => ({
@@ -433,6 +483,8 @@ export type Comment = typeof comments.$inferSelect;
 export type Activity = typeof activities.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
+export type McpClient = typeof mcpClients.$inferSelect;
+export type McpConnection = typeof mcpConnections.$inferSelect;
 
 /** Public shape of a user, safe to send to the client. */
 export type SafeUser = Omit<User, "passwordHash">;

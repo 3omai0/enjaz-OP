@@ -1,8 +1,11 @@
 import { cookies } from "next/headers";
+import { actingUser } from "@/lib/auth/acting";
 import { DEFAULT_LANG, isLang, LANG_COOKIE, plural, type Lang, type Pair, type PluralForms } from "./index";
 
-/** Language for the current request, read from the preference cookie. */
+/** Language for the current request: the preference cookie, or the account's language for calls from Claude. */
 export async function getLang(): Promise<Lang> {
+  const acting = actingUser();
+  if (acting) return isLang(acting.locale) ? acting.locale : DEFAULT_LANG;
   const store = await cookies();
   const value = store.get(LANG_COOKIE)?.value;
   return isLang(value) ? value : DEFAULT_LANG;
