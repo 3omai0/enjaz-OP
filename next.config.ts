@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       { source: "/projects/:id/my-tasks", destination: "/projects/:id/tasks?assignee=me", permanent: false },
     ];
   },
+  // OAuth discovery for the Claude connector (see src/lib/mcp/oauth.ts) lives at the standard addresses.
+  async rewrites() {
+    return [
+      { source: "/.well-known/oauth-protected-resource/:path*", destination: "/api/oauth/metadata/protected-resource" },
+      { source: "/.well-known/oauth-authorization-server/:path*", destination: "/api/oauth/metadata/authorization-server" },
+      { source: "/.well-known/openid-configuration/:path*", destination: "/api/oauth/metadata/authorization-server" },
+    ];
+  },
   async headers() {
     return [
       {

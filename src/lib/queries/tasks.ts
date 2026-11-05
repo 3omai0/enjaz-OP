@@ -204,6 +204,35 @@ async function visibleOrNothing<T>(taskId: string, run: () => Promise<T>): Promi
   return isUuid(taskId) ? run() : null;
 }
 
+/**
+ * Tasks the user may see across their team projects (archived ones and
+ * personal spaces left out), for Claude's connector. Open work by default,
+ * soonest due first, then the most urgent.
+ */
+export async function listVisibleTasks(
+  user: Actor,
+  filters: { statuses?: TaskStatus[]; openOnly?: boolean; assignee?: TaskFilters["assignee"]; priority?: TaskPriority; due?: DueFilter; q?: string },
+  limit: number
+): Promise<TaskCard[]> {
+  const db = await getDb();
+  const conditions: SQL[] = [visibleTasksFilter(db, user)];
+  if (filters.statuses?.length) conditions.push(inArray(tasks.status, filters.statuses));
+  else if (filters.openOnly) conditions.push(ne(tasks.status, "done"));
+  if (filters.assignee === "me") conditions.push(assignedTo(user.id));
+  else if (filters.assignee === "general") conditions.push(generalTask());
+  else if (filters.assignee && filters.assignee !== "all") conditions.push(assignedTo(filters.assignee));
+  if (filters.priority) conditions.push(eq(tasks.priority, filters.priority));
+  if (filters.due) conditions.push(...dueCondition(filters.due));
+  if (filters.q?.trim()) conditions.push(searchCondition(filters.q.trim()));
+  const rows = await db.query.tasks.findMany({
+    where: and(...conditions),
+    orderBy: [sql`${tasks.dueDate} asc nulls last`, desc(tasks.priority), desc(tasks.updatedAt)],
+    limit,
+    with: cardWith,
+  });
+  return decorate(rows);
+}
+
 /** Everything assigned to the person across team projects that are not archived (never their personal tasks). */
 export async function listMyTasks(userId: string, includeDone = false): Promise<TaskCard[]> {
   const db = await getDb();

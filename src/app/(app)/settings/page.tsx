@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { ClaudeCard } from "@/components/settings/claude-card";
 import { LanguageCard } from "@/components/settings/language-card";
 import { NotificationsCard } from "@/components/settings/notifications-card";
 import { PasswordForm } from "@/components/settings/password-form";
@@ -6,9 +8,11 @@ import { ProfileForm } from "@/components/settings/profile-form";
 import { RoleBadge } from "@/components/ui/badge";
 import { Card, CardHeader, PageHeader } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/session";
-import { fmtDate } from "@/lib/format";
+import { fmtDate, fmtRelative } from "@/lib/format";
 import { dict } from "@/lib/i18n/dictionary";
 import { getT } from "@/lib/i18n/server";
+import { mcpUrl, originFromHeaders } from "@/lib/mcp/oauth";
+import { listMcpConnections } from "@/lib/queries/connections";
 import { countPushDevices } from "@/lib/queries/users";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SettingsPage() {
   const user = await requireUser();
   const { t, lang } = await getT();
-  const devices = await countPushDevices(user.id);
+  const [devices, connections, requestHeaders] = await Promise.all([countPushDevices(user.id), listMcpConnections(user.id), headers()]);
 
   return (
     <div>
@@ -32,6 +36,10 @@ export default async function SettingsPage() {
         </div>
         <div className="space-y-6">
           <LanguageCard />
+          <ClaudeCard
+            url={mcpUrl(originFromHeaders(requestHeaders))}
+            connections={connections.map((c) => ({ id: c.id, name: c.name, connectedOn: fmtDate(c.createdAt, lang), lastUsed: c.lastUsedAt ? fmtRelative(c.lastUsedAt, lang) : null }))}
+          />
           <Card>
             <CardHeader title={t(dict.settings.account)} />
             <dl className="space-y-3 text-sm">

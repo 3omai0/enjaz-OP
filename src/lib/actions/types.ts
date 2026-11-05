@@ -25,7 +25,8 @@ const ORIGIN = "http://injaz.invalid";
  * origin catches every such trick. API routes are never a destination.
  */
 export function safePath(value: string | null | undefined, fallback: string) {
-  if (!value || value.length > 1024) return fallback;
+  // Long enough for the Claude sign-in page (/oauth/authorize) with all its parameters.
+  if (!value || value.length > 4096) return fallback;
   if (!value.startsWith("/") || /[\\\u0000-\u001f]/.test(value)) return fallback;
   try {
     const url = new URL(value, ORIGIN);

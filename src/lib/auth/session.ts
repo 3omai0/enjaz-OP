@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { getDb } from "@/db";
 import { users, type SafeUser, type UserRole } from "@/db/schema";
+import { actingUser } from "./acting";
 import { SESSION_COOKIE, SESSION_DAYS, signSessionToken, verifySessionToken, type SessionPayload } from "./jwt";
 
 export async function createSession(user: Pick<SafeUser, "id" | "role" | "name" | "email" | "sessionVersion">) {
@@ -36,6 +37,9 @@ export const getSession = cache(async (): Promise<SessionPayload | null> => {
  * signed out everywhere (password changed or reset since the cookie was issued).
  */
 export const getCurrentUser = cache(async (): Promise<SafeUser | null> => {
+  // A call from Claude: the access token was checked and the person loaded already (see lib/auth/acting.ts).
+  const acting = actingUser();
+  if (acting) return acting;
   const session = await getSession();
   if (!session) return null;
   const db = await getDb();

@@ -1,8 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/jwt";
 
-/** Pages reachable without a session. The API routes answer for themselves instead of redirecting. */
-const PUBLIC_PATHS = ["/login", "/setup", "/api/auth/clear", "/api/updates", "/api/lang", "/api/push", "/api/cron"];
+/**
+ * Pages reachable without a session. The API routes answer for themselves instead of redirecting.
+ * Claude's connector (/api/mcp) and its sign-in endpoints use access tokens, not the cookie.
+ */
+const PUBLIC_PATHS = ["/login", "/setup", "/api/auth/clear", "/api/updates", "/api/lang", "/api/push", "/api/cron", "/api/mcp", "/api/oauth", "/.well-known"];
 
 /**
  * Route guard. Anything that is not a public page needs a valid session

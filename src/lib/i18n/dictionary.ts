@@ -764,6 +764,51 @@ export const dict = {
     memberSince: { ar: "عضو منذ", en: "Member since" },
   },
 
+  /** Connecting Claude (or another MCP app) to the account. */
+  mcp: {
+    consentTitle: { ar: "السماح لـ {app} بالعمل في إنجاز؟", en: "Allow {app} to work in Injaz?" },
+    consentSubtitle: { ar: "سيعمل باسمك وبصلاحيات حسابك نفسها، ولن يرى أكثر مما تراه أنت.", en: "It acts as you, with your account's permissions, and sees nothing you cannot see." },
+    signedInAs: { ar: "مسجّل الدخول باسم", en: "Signed in as" },
+    canDo: { ar: "سيتمكن من:", en: "It will be able to:" },
+    abilities: {
+      ar: ["عرض المشاريع والمهام المتاحة لك", "إنشاء المهام وتعديلها ونقلها بين الحالات", "إضافة التعليقات وبنود قوائم التحقق", "قراءة إشعاراتك"],
+      en: ["See the projects and tasks available to you", "Create, edit and move tasks", "Add comments and checklist items", "Read your notifications"],
+    },
+    returnsTo: { ar: "ستعود بعد الموافقة إلى", en: "After approving you return to" },
+    allow: { ar: "السماح", en: "Allow" },
+    deny: { ar: "رفض", en: "Deny" },
+    revokeHint: { ar: "يمكنك فصل الاتصال في أي وقت من الإعدادات.", en: "You can disconnect it any time in Settings." },
+    invalidTitle: { ar: "طلب ربط غير صالح", en: "Invalid connection request" },
+    invalidClient: { ar: "التطبيق الذي طلب الربط غير معروف. ارجع إلى Claude وأعد إضافة الموصّل.", en: "The app asking to connect is unknown. Go back to Claude and add the connector again." },
+    invalidRedirect: { ar: "عنوان الرجوع في الطلب لا يطابق ما سجّله التطبيق، لذلك أوقفنا الطلب لحمايتك.", en: "The return address does not match what the app registered, so the request was stopped to protect you." },
+    cardTitle: { ar: "الربط مع Claude", en: "Connect Claude" },
+    cardDesc: { ar: "أضف إنجاز إلى Claude لتنشئ المهام وتتابعها بالكتابة أو الصوت.", en: "Add Injaz to Claude to create and follow up tasks by typing or voice." },
+    urlLabel: { ar: "رابط الموصّل", en: "Connector URL" },
+    copy: { ar: "نسخ", en: "Copy" },
+    copied: { ar: "تم نسخ الرابط.", en: "Link copied." },
+    steps: {
+      ar: [
+        "في Claude افتح الإعدادات ثم «الموصّلات» (Connectors).",
+        "اختر «إضافة موصّل مخصص» (Add custom connector) والصق الرابط أعلاه، وسمّه «إنجاز».",
+        "اضغط «اتصال» (Connect)، وسجّل دخولك في إنجاز ووافق.",
+        "جرّب: «أضف مهمة في مشروع … بعنوان … وأسندها لـ … موعدها الخميس».",
+      ],
+      en: [
+        "In Claude, open Settings, then Connectors.",
+        "Choose Add custom connector, paste the URL above and name it Injaz.",
+        "Press Connect, sign in to Injaz and approve.",
+        "Try: \"Add a task in project … called … assigned to … due Thursday\".",
+      ],
+    },
+    connections: { ar: "التطبيقات المتصلة", en: "Connected apps" },
+    noConnections: { ar: "لا يوجد تطبيق متصل بحسابك حاليًا.", en: "No app is connected to your account yet." },
+    connectedOn: { ar: "متصل منذ {date}", en: "Connected {date}" },
+    lastUsed: { ar: "آخر استخدام {date}", en: "Last used {date}" },
+    disconnect: { ar: "فصل", en: "Disconnect" },
+    disconnectConfirm: { ar: "فصل {app}؟ سيتوقف عن الوصول إلى حسابك فورًا.", en: "Disconnect {app}? It loses access to your account at once." },
+    disconnected: { ar: "تم فصل التطبيق.", en: "App disconnected." },
+  },
+
   /** Spoken by screen readers while a card is moved on the board with the keyboard. */
   board: {
     dragInstructions: {

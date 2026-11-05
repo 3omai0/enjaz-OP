@@ -50,6 +50,13 @@
       "when": 1791752136610,
       "tag": "0006_recurring_tasks",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793865238414,
+      "tag": "0007_mcp_connections",
+      "breakpoints": true
     }
   ]
 }

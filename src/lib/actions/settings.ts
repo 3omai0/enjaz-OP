@@ -3,13 +3,13 @@
 import { and, eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { getDb } from "@/db";
-import { pushSubscriptions, users } from "@/db/schema";
+import { mcpConnections, pushSubscriptions, users } from "@/db/schema";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession, requireUser } from "@/lib/auth/session";
 import { dict } from "@/lib/i18n/dictionary";
 import { getT } from "@/lib/i18n/server";
 import { isMyTasksScope, MY_TASKS_SCOPE_COOKIE } from "@/lib/my-tasks";
-import { clip } from "@/lib/utils";
+import { clip, isUuid } from "@/lib/utils";
 import { guard, revalidateAll } from "./helpers";
 import { optStr, str, type ActionState } from "./types";
 
@@ -71,4 +71,17 @@ export async function setMyTasksScopeAction(scope: string) {
   if (!isMyTasksScope(scope)) return;
   const store = await cookies();
   store.set(MY_TASKS_SCOPE_COOKIE, scope, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 24 * 365 });
+}
+
+/** Disconnect an app (such as Claude) from the person's own account. It loses access with its next request. */
+export async function disconnectMcpAction(connectionId: string): Promise<ActionState> {
+  return guard(async () => {
+    const user = await requireUser();
+    const { t } = await getT();
+    if (!isUuid(connectionId)) return { error: t(dict.common.notFound) };
+    const db = await getDb();
+    await db.delete(mcpConnections).where(and(eq(mcpConnections.id, connectionId), eq(mcpConnections.userId, user.id)));
+    revalidateAll();
+    return { ok: true, message: t(dict.mcp.disconnected) };
+  });
 }
